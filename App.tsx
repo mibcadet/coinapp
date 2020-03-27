@@ -14,7 +14,7 @@ export default function App() {
     <>
       <IconRegistry icons={EvaIconsPack}/>
       <ApplicationProvider mapping={mapping} theme={lightTheme}>
-          <View style={{flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', paddingTop: Constants.statusBarHeight}}>
+          <View style={{flex: 1, display: 'flex', alignItems: 'center', paddingTop: Constants.statusBarHeight}}>
               <CoinsList />
           </View>
       </ApplicationProvider>

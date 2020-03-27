@@ -27,7 +27,7 @@ describe('<CoinsList />', () => {
     });
 
     it('renders coin details properly', () => {
-        const testRenderer = renderer.create(app(<CoinDetails item={{name: 'testTitleOfItem'}} />));
+        const testRenderer = renderer.create(app(<CoinDetails item={{name: 'testTitleOfItem'}} index={0} />));
         expect(testRenderer.root.findByType(ListItem)).toBeTruthy();
     });
 });

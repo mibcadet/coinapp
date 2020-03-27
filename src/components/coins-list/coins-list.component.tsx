@@ -1,10 +1,8 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
-
 import { Dimensions, View } from 'react-native';
+
 import {
-    List,
-    ListItem
+    List, Spinner,
 } from '@ui-kitten/components';
 
 import { useCoins } from '../../services/coin-api';
@@ -19,8 +17,13 @@ export const CoinsList = () => {
     const [coins, loading] = useCoins();
 
     return (
-        <List data={coins}
-              renderItem={CoinDetails}
-              style={{flex: 1, borderWidth: 2, borderColor: "#f00"}} />
+        <View style={{flex: 1}}>
+            {
+            loading ? <Spinner /> :
+            <List data={coins}
+                renderItem={CoinDetails}
+                style={{flex: 1, borderWidth: 2, borderColor: "#f00"}} />
+            }
+        </View>
     );
 };
