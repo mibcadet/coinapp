@@ -1,8 +1,9 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 
 import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import {
-    ListItem, Spinner
+    ListItem, Spinner, Icon
 } from '@ui-kitten/components';
 
 import {
@@ -23,52 +24,51 @@ const Chart: React.FC<IChartProps> = ({coinId}) => {
     const [data, loading] = useAllTickers(coinId);
 
     return (
-        <>
-            {/* { loading ? <Spinner /> :
+        <View style={{height: 50, width: 100, backgroundColor: "#FF0"}}>
+            {/* { loading && data.length > 0 ? <Spinner /> :
                 <LineChart
-                width={100}
-                height={100}
+                width={500}
+                height={400}
                 chartConfig={{
                 labelColor: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
                 color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
                 }}
                 data={{
-                labels: data.map((ticker, index) => index.toString()),
+                //labels: data.map((ticker, index) => index.toString()),
+                labels: [1,2,3,4,5,6,7].map(e => e.toString()),
                 datasets: [{
-                data
+                //data,
+                color: (opacity = 1) => `rgba(255, 255, 146, ${opacity})`,
+                data: [0.1,0.0002,0.00003,4.0000,5,6,7]
                 }],
                 }} />
                 } */}
-        </>
+        </View>
     );
 };
 
 export const CoinDetails = ({item, index}) => {
 
-    //temp data example
-    /* "id": "mx-mx-token",
-     * "is_active": true,
-     * "is_new": false,
-     * "name": "MX Token",
-     * "rank": 175,
-     * "symbol": "MX",
-     * "type": "token", */
-
     return (
         <ListItem>
             <View style={styles.row}>
                 <View style={styles.cell}>
-                    <Text>{item.symbol}</Text>
-                    <Text>{index}</Text>
-                </View>
-                <View style={styles.cell}>
-                    <Text>{item.symbol}</Text>
-                    <Text>{item.name}</Text>
+                    <View style={styles.row}>
+                        <View style={styles.cell}>
+                            <Icon name="globe" width={16} height={16} />
+                            <Text style={{width: 16}}>{index}</Text>
+                        </View>
+                        <View>
+                            <Text>{item.symbol}</Text>
+                            <Text>{item.name}</Text>
+                        </View>
+                    </View>
                 </View>
                 <View style={styles.cell}>
                     <Chart coinId={item.id} />
                 </View>
                 <View style={styles.cell}>
+                    <Text>$ {usdFormat(item.price)}</Text>
                 </View>
             </View>
         </ListItem>
@@ -80,15 +80,22 @@ const styles = StyleSheet.create({
         flex: 1,
         display: 'flex',
         flexDirection: 'column',
-        width: (SCREEN_WIDTH * 0.9) / 4,
-        height: 50,
         justifyContent: 'center',
+        alignItems: 'center',
         alignContent: 'center',
-        backgroundColor: "#f0f"
+        backgroundColor: "#f0f",
+        borderWidth: 2,
+        borderColor: "#00F"
     },
     row: {
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        borderWidth: 2,
+        borderColor: "#000"
     }
 });
+
+function usdFormat(price: string): string {
+    return parseFloat(price).toFixed(2);
+}
