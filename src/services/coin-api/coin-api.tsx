@@ -1,41 +1,43 @@
 import { useState, useEffect } from 'react';
 import moment from 'moment';
+import { Ticker } from '../../models/Ticker';
 
 import CoinpaprikaAPI from '@coinpaprika/api-nodejs-client';
 
-export function useCoins(): [any[], boolean] {
+export function useLatestTickers(lastIndex: number = 30): [Ticker[], boolean] {
 
     const client = new CoinpaprikaAPI();
 
-    const [data, setData] = useState<any[]>([]);
+    const [data, setData] = useState<Ticker[]>([]);
     const [isLoading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         setLoading(true);
-        client.getAllTickers().then((tickers: any) => {
-            const formattedTickers = tickers.map((ticker) => ({
+        client.getAllTickers().then((tickers: ApiTicker[]) => {
+            const formattedTickers = tickers.map((ticker: ApiTicker) => ({
                 id: ticker.id,
                 name: ticker.name,
                 price: ticker.quotes.USD.price,
                 symbol: ticker.symbol
             }));
-            setData(formattedTickers);
+            setData(formattedTickers.slice(0, lastIndex));
             setLoading(false);
         });
-    }, []);
+    }, [lastIndex]);
 
     return [data, isLoading];
 }
 
-export function useAllTickers(coinId: string): [any[], boolean] {
+export function useHistoryTickers(coinId: string): [any[], boolean, boolean] {
 
     const client = new CoinpaprikaAPI();
 
     const [tickers, setTickers] = useState<any[]>([]);
-    const [isLoading, setLoading] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [hasErrors, setHasErrors] = useState<boolean>(false);
 
     useEffect(() => {
-        setLoading(true);
+        setIsLoading(true);
         client.getAllTickers({
             coinId: coinId,
             historical: {
@@ -43,12 +45,34 @@ export function useAllTickers(coinId: string): [any[], boolean] {
                 end: moment().format('YYYY-MM-DD'),
                 limit: 24,
                 quote: 'usd',
-                interval: '60m'
+                interval: '1h'
             }
-        }).then((tickers) => {
+        }).then((tickers: ApiHistoryTicker[]) => {
             setTickers(tickers);
-        }).catch(console.error)
-    }, []);
+            setIsLoading(false);
+        }).catch(() => {
+            setHasErrors(true);
+        });
+    }, [client, coinId]);
 
-    return [tickers, isLoading];
+    return [tickers, isLoading, hasErrors];
+}
+
+type ApiTicker = {
+    id: string;
+    name: string;
+    price: string;
+    symbol: string;
+    quotes: {
+        USD: {
+            price: string;
+        }
+    },
+};
+
+type ApiHistoryTicker = {
+    "market_cap": string;
+    "price": string;
+    "timestamp": string;
+    "volume_24h": string;
 }

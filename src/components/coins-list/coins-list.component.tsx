@@ -1,21 +1,18 @@
 import * as React from 'react';
-import { Dimensions, View } from 'react-native';
+import { useEffect, useState } from 'react';
 
 import {
     List, Spinner, Text,
 } from '@ui-kitten/components';
 
-import { useCoins } from '../../services/coin-api';
+import { useLatestTickers } from '../../services/coin-api';
 import { CoinDetails } from './coin-details.component';
-import { useEffect } from 'react';
-
-const SCREEN_DIMENSIONS = Dimensions.get('screen');
-const SCREEN_WIDTH = SCREEN_DIMENSIONS.width;
-const SCREEN_HEIGHT = SCREEN_DIMENSIONS.height;
+import { View } from 'react-native';
 
 export const CoinsList = () => {
 
-    const [coins, loading] = useCoins();
+    const [lastIndex, setLastIndex] = useState<number>(30);
+    const [coins, loading] = useLatestTickers(lastIndex);
 
     return (
         <View style={{flex: 1}}>
@@ -24,6 +21,10 @@ export const CoinsList = () => {
             loading ? <Spinner /> :
             <List data={coins}
                 renderItem={CoinDetails}
+                  onEndReached={() => {
+                      setLastIndex(lastIndex => lastIndex + 30);
+                  }}
+                  onEndReachedThreshold={10}
                 style={{flex: 1, borderWidth: 2, borderColor: "#f00"}} />
             }
         </View>

@@ -1,2 +1,2 @@
-import { useCoins, useAllTickers } from './coin-api';
-export { useCoins, useAllTickers };
+import { useLatestTickers, useHistoryTickers } from './coin-api';
+export { useLatestTickers, useHistoryTickers };
