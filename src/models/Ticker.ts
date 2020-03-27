@@ -3,4 +3,5 @@ export type Ticker = {
     name: string;
     symbol: string;
     price: string;
+    marketCap: number;
 };

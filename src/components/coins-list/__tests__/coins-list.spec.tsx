@@ -27,7 +27,14 @@ describe('<CoinsList />', () => {
     });
 
     it('renders coin details properly', () => {
-        const testRenderer = renderer.create(app(<CoinDetails item={{name: 'testTitleOfItem'}} index={0} />));
+        const testRenderer = renderer.create(app(<CoinDetails item={coinDetails} index={0} />));
         expect(testRenderer.root.findByType(ListItem)).toBeTruthy();
     });
 });
+
+const coinDetails = {
+    id: 'btc-bitcoin',
+    price: '6779',
+    name: 'Bitcoin',
+    symbol: 'BTC'
+}

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect } from 'react';
 
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import {
     ListItem, Spinner, Icon
 } from '@ui-kitten/components';
@@ -11,6 +11,7 @@ import {
 } from "react-native-chart-kit";
 
 import { useHistoryTickers } from '../../services/coin-api';
+import { Ticker } from 'models/Ticker';
 
 interface IChartProps {
     coinId: string;
@@ -24,7 +25,7 @@ const Chart: React.FC<IChartProps> = ({coinId}) => {
         <View style={{height: 50, width: 100, backgroundColor: "#FF0"}}>
             {
                 !loading && !hasErrors && data instanceof Array && data.map(ticker => {
-                    <Text>{ticker.price}.</Text>
+                    <Text>#{ticker.price}#</Text>
                 })
             }
             {
@@ -34,7 +35,7 @@ const Chart: React.FC<IChartProps> = ({coinId}) => {
     );
 };
 
-export const CoinDetails = ({item, index}) => {
+export const CoinDetails: React.FC<{item:Ticker, index: number}> = ({item, index}) => {
 
     return (
         <ListItem>
@@ -88,22 +89,3 @@ function ellipsis(text: string) {
         return text.split('').slice(0, text.length - 3).join('') + '...';
     return text;
 }
-
-/* { loading && data.length > 0 ? <Spinner /> :
-    <LineChart
-    width={500}
-    height={400}
-    chartConfig={{
-    labelColor: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-    color: (opacity = 1) => `rgba(26, 255, 146, ${opacity})`,
-    }}
-    data={{
-    //labels: data.map((ticker, index) => index.toString()),
-    labels: [1,2,3,4,5,6,7].map(e => e.toString()),
-    datasets: [{
-    //data,
-    color: (opacity = 1) => `rgba(255, 255, 146, ${opacity})`,
-    data: [0.1,0.0002,0.00003,4.0000,5,6,7]
-    }],
-    }} />
-    } */

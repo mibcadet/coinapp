@@ -18,6 +18,7 @@ export function useLatestTickers(lastIndex: number = 30): [Ticker[], boolean] {
                 id: ticker.id,
                 name: ticker.name,
                 price: ticker.quotes.USD.price,
+                marketCap: parseFloat(ticker.quotes.USD.market_cap),
                 symbol: ticker.symbol
             }));
             setData(formattedTickers.slice(0, lastIndex));
@@ -28,7 +29,7 @@ export function useLatestTickers(lastIndex: number = 30): [Ticker[], boolean] {
     return [data, isLoading];
 }
 
-export function useHistoryTickers(coinId: string): [any[], boolean, boolean] {
+export function useHistoryTickers(coinId: string): [Ticker[], boolean, boolean] {
 
     const client = new CoinpaprikaAPI();
 
@@ -53,7 +54,7 @@ export function useHistoryTickers(coinId: string): [any[], boolean, boolean] {
         }).catch(() => {
             setHasErrors(true);
         });
-    }, [client, coinId]);
+    }, []);
 
     return [tickers, isLoading, hasErrors];
 }
@@ -66,13 +67,20 @@ type ApiTicker = {
     quotes: {
         USD: {
             price: string;
+            market_cap: string;
         }
     },
 };
 
 type ApiHistoryTicker = {
-    "market_cap": string;
-    "price": string;
-    "timestamp": string;
-    "volume_24h": string;
+    market_cap: string;
+    price: string;
+    timestamp: string;
+    volume_24h: string;
+}
+
+
+const sortings = {
+    byMarketCapAsc: (a: Ticker, b: Ticker) => a.marketCap > b.marketCap,
+    byMarketCapDesc: (a: Ticker, b: Ticker) => b.marketCap < a.marketCap
 }
