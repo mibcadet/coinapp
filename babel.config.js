@@ -1,7 +1,8 @@
 const path = require('path');
 
 const paths = {
-  "@components": path.resolve(__dirname, 'src/components')
+  "@components": path.resolve(__dirname, 'src/components'),
+  "@services": path.resolve(__dirname, 'src/services')
 };
 
 module.exports = function(api) {

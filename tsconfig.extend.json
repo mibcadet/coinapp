@@ -10,11 +10,13 @@
     "baseUrl": "src",
     "paths": {
       "components/*": ["./components/*"],
-      "libs/*": ["./libs/*"]
+      "libs/*": ["./libs/*"],
+      "services/*": ["./services/*"]
     }
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "./"
   ],
   "exclude": [
     "node_modules",
