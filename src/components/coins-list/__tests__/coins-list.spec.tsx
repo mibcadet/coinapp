@@ -2,16 +2,20 @@ import * as React from 'react';
 import renderer from 'react-test-renderer';
 
 import { light as lightTheme, mapping } from '@eva-design/eva';
-import { ApplicationProvider, List, ListItem } from '@ui-kitten/components';
+import { ApplicationProvider, List, ListItem, IconRegistry } from '@ui-kitten/components';
+import { EvaIconsPack } from '@ui-kitten/eva-icons';
 
 import { CoinsList } from '../coins-list.component';
 import { CoinDetails } from '../coin-details.component';
 
 function app(component) {
     return (
-        <ApplicationProvider mapping={mapping} theme={lightTheme}>
-            {component}
-        </ApplicationProvider>
+        <>
+            <IconRegistry icons={EvaIconsPack}/>
+            <ApplicationProvider mapping={mapping} theme={lightTheme}>
+                {component}
+            </ApplicationProvider>
+        </>
     );
 }
 
@@ -36,5 +40,7 @@ const coinDetails = {
     id: 'btc-bitcoin',
     price: '6779',
     name: 'Bitcoin',
-    symbol: 'BTC'
+    symbol: 'BTC',
+    marketCap: 123123123123,
+    historyTickers: [],
 }

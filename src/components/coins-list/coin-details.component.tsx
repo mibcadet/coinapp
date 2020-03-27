@@ -3,45 +3,51 @@ import { useEffect } from 'react';
 
 import { StyleSheet, Text, View } from 'react-native';
 import {
-    ListItem, Spinner, Icon
+    ListItem, Icon
 } from '@ui-kitten/components';
 
 import {
     LineChart
 } from "react-native-chart-kit";
 
-import { useHistoryTickers } from '../../services/coin-api';
 import { Ticker } from 'models/Ticker';
+import { ApiHistoryTicker } from 'services/coin-api/coin-api';
 
 interface IChartProps {
-    coinId: string;
+    historyTickers: ApiHistoryTicker[];
 }
 
-const Chart: React.FC<IChartProps> = ({coinId}) => {
+const Chart: React.FC<IChartProps> = ({historyTickers}) => {
 
-    const [data, loading, hasErrors] = useHistoryTickers(coinId);
+    useEffect(() => {
+        console.log(historyTickers);
+    }, [historyTickers]);
 
     return (
         <View style={{height: 50, width: 100, backgroundColor: "#FF0"}}>
             {
-                !loading && !hasErrors && data instanceof Array && data.map(ticker => {
+                historyTickers instanceof Array && historyTickers.map(ticker => {
                     <Text>#{ticker.price}#</Text>
                 })
-            }
-            {
-                loading ? <Spinner /> : <Text style={{position: 'absolute', width: 80, height: 30}}>some chart</Text>
             }
         </View>
     );
 };
 
-export const CoinDetails: React.FC<{item:Ticker, index: number}> = ({item, index}) => {
+interface ICoinDetailsProps {
+    item: Ticker;
+    index: number;
+}
+
+export const CoinDetails: React.FC<ICoinDetailsProps> = ({item, index}) => {
+
+    useEffect(() => {}, [item]);
 
     return (
         <ListItem>
             <View style={styles.row}>
                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}>
-                    <View style={{width: 86, display: 'flex', flexDirection: 'column'}}>
+                    <View style={{width: 36, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                         <Icon name="globe" width={16} height={16} />
                         <Text>{index}</Text>
                     </View>
@@ -51,7 +57,7 @@ export const CoinDetails: React.FC<{item:Ticker, index: number}> = ({item, index
                     </View>
                 </View>
                 <View style={styles.cell}>
-                    <Chart coinId={item.id} />
+                    <Chart historyTickers={item.historyTickers} />
                 </View>
                 <View style={styles.cell}>
                     <Text>$ {usdFormat(item.price)}</Text>

@@ -4,59 +4,62 @@ import { Ticker } from '../../models/Ticker';
 
 import CoinpaprikaAPI from '@coinpaprika/api-nodejs-client';
 
-export function useLatestTickers(lastIndex: number = 30): [Ticker[], boolean] {
+const defaultPaging = 30;
 
-    const [data, setData] = useState<Ticker[]>([]);
+export function useLatestTickers(lastIndex: number = defaultPaging, sorting = false, sortDirection = false): [Ticker[], boolean] {
+
+    const [coins, setCoins] = useState<Ticker[]>([]);
     const [isLoading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         setLoading(true);
         const client = new CoinpaprikaAPI();
+
         client.getAllTickers().then((tickers: ApiTicker[]) => {
-            const formattedTickers = tickers.map((ticker: ApiTicker) => ({
+
+            const formattedTickers = tickers.slice(lastIndex - defaultPaging, lastIndex).map((ticker: ApiTicker) => ({
                 id: ticker.id,
                 name: ticker.name,
                 price: ticker.quotes.USD.price,
                 marketCap: parseFloat(ticker.quotes.USD.market_cap),
-                symbol: ticker.symbol
+                symbol: ticker.symbol,
+                historyTickers: []
             }));
-            setData(data => [...data, ...formattedTickers.slice(lastIndex -30, lastIndex)]);
-            setLoading(false);
+
+            Promise.all(formattedTickers.map(formattedTicker => {
+                return client.getAllTickers({
+                    coinId: formattedTicker.id,
+                    historical: {
+                        start: moment().subtract(1, 'days').format('YYYY-MM-DD'),
+                        end: moment().format('YYYY-MM-DD'),
+                        limit: 24,
+                        quote: 'usd',
+                        interval: '1h'
+                    }
+                }).then((historyTickers: ApiHistoryTicker[]) => {
+                    formattedTicker.historyTickers = historyTickers
+                });
+            }))
+            .then(() => {
+                const unsorted = [...coins, ...formattedTickers]
+
+                if (sorting) {
+                    const sorted = unsorted.sort((a,b) => {
+                        if (sortDirection)
+                            return a.marketCap - b.marketCap
+                        else
+                            return b.marketCap - a.marketCap
+                    });
+                    setCoins(sorted);
+                } else {
+                    setCoins(unsorted);
+                }
+                setLoading(false);
+            });
         });
-    }, [lastIndex]);
+    }, [lastIndex, sorting, sortDirection]);
 
-    return [data, isLoading];
-}
-
-export function useHistoryTickers(coinId: string): [ApiHistoryTicker[], boolean, boolean] {
-
-    const [tickers, setTickers] = useState<ApiHistoryTicker[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [hasErrors, setHasErrors] = useState<boolean>(false);
-
-    useEffect(() => {
-        setIsLoading(true);
-
-        const client = new CoinpaprikaAPI();
-
-        client.getAllTickers({
-            coinId: coinId,
-            historical: {
-                start: moment().subtract(1, 'days').format('YYYY-MM-DD'),
-                end: moment().format('YYYY-MM-DD'),
-                limit: 24,
-                quote: 'usd',
-                interval: '1h'
-            }
-        }).then((tickers: ApiHistoryTicker[]) => {
-            setTickers(tickers);
-            setIsLoading(false);
-        }).catch(() => {
-            setHasErrors(true);
-        });
-    }, []);
-
-    return [tickers, isLoading, hasErrors];
+    return [coins, isLoading];
 }
 
 type ApiTicker = {
@@ -64,6 +67,7 @@ type ApiTicker = {
     name: string;
     price: string;
     symbol: string;
+    historyTickers: ApiHistoryTicker[];
     quotes: {
         USD: {
             price: string;
@@ -72,15 +76,9 @@ type ApiTicker = {
     },
 };
 
-type ApiHistoryTicker = {
+export type ApiHistoryTicker = {
     market_cap: string;
     price: string;
     timestamp: string;
     volume_24h: string;
-}
-
-
-const sortings = {
-    byMarketCapAsc: (a: Ticker, b: Ticker) => a.marketCap > b.marketCap,
-    byMarketCapDesc: (a: Ticker, b: Ticker) => b.marketCap < a.marketCap
 }
