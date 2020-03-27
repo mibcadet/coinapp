@@ -6,13 +6,12 @@ import CoinpaprikaAPI from '@coinpaprika/api-nodejs-client';
 
 export function useLatestTickers(lastIndex: number = 30): [Ticker[], boolean] {
 
-    const client = new CoinpaprikaAPI();
-
     const [data, setData] = useState<Ticker[]>([]);
     const [isLoading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         setLoading(true);
+        const client = new CoinpaprikaAPI();
         client.getAllTickers().then((tickers: ApiTicker[]) => {
             const formattedTickers = tickers.map((ticker: ApiTicker) => ({
                 id: ticker.id,
@@ -21,7 +20,7 @@ export function useLatestTickers(lastIndex: number = 30): [Ticker[], boolean] {
                 marketCap: parseFloat(ticker.quotes.USD.market_cap),
                 symbol: ticker.symbol
             }));
-            setData(formattedTickers.slice(0, lastIndex));
+            setData(data => [...data, ...formattedTickers.slice(lastIndex -30, lastIndex)]);
             setLoading(false);
         });
     }, [lastIndex]);
@@ -29,16 +28,17 @@ export function useLatestTickers(lastIndex: number = 30): [Ticker[], boolean] {
     return [data, isLoading];
 }
 
-export function useHistoryTickers(coinId: string): [Ticker[], boolean, boolean] {
+export function useHistoryTickers(coinId: string): [ApiHistoryTicker[], boolean, boolean] {
 
-    const client = new CoinpaprikaAPI();
-
-    const [tickers, setTickers] = useState<any[]>([]);
+    const [tickers, setTickers] = useState<ApiHistoryTicker[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [hasErrors, setHasErrors] = useState<boolean>(false);
 
     useEffect(() => {
         setIsLoading(true);
+
+        const client = new CoinpaprikaAPI();
+
         client.getAllTickers({
             coinId: coinId,
             historical: {

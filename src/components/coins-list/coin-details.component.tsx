@@ -41,9 +41,9 @@ export const CoinDetails: React.FC<{item:Ticker, index: number}> = ({item, index
         <ListItem>
             <View style={styles.row}>
                 <View style={{display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center'}}>
-                    <View style={{width: 30, display: 'flex', flexDirection: 'column'}}>
+                    <View style={{width: 86, display: 'flex', flexDirection: 'column'}}>
                         <Icon name="globe" width={16} height={16} />
-                        <Text style={{width: 16}}>{index}</Text>
+                        <Text>{index}</Text>
                     </View>
                     <View style={{width: 80, display: 'flex', flexDirection: 'column'}}>
                         <Text>{item.symbol}</Text>
@@ -85,7 +85,7 @@ function usdFormat(price: string): string {
 }
 
 function ellipsis(text: string) {
-    if (text.length > 10)
+    if (text && text.length > 10)
         return text.split('').slice(0, text.length - 3).join('') + '...';
-    return text;
+    return text || '';
 }

@@ -14,21 +14,17 @@ export const CoinsList: React.FC = () => {
     const [lastIndex, setLastIndex] = useState<number>(30);
     const [coins, loading] = useLatestTickers(lastIndex);
 
-    useEffect(() => {}, []);
-
     return (
-        <View style={{flex: 1}}>
+        <View style={{flex: 1, alignItems: 'center'}}>
             <Text>Coins</Text>
-            {
-                loading ? <Spinner /> :
-                <List data={coins}
-                    renderItem={CoinDetails}
-                    onEndReached={() => {
-                        setLastIndex(lastIndex => lastIndex + 30);
-                    }}
-                    onEndReachedThreshold={10}
-                    style={{flex: 1, borderWidth: 2, borderColor: "#f00"}} />
-            }
+            <List data={coins}
+                renderItem={CoinDetails}
+                onEndReached={() => {
+                    setLastIndex(lastIndex => lastIndex + 30);
+                }}
+                onEndReachedThreshold={30}
+                style={{flex: 1, borderWidth: 2, borderColor: "#f00"}} />
+            { loading && <Spinner size="giant" />}
         </View>
     );
 };
